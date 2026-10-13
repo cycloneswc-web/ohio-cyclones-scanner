@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+<title>Ohio Cyclones QR Scanner</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+body {
+margin: 0;
+padding: 20px;
+background: #101827;
+color: white;
+font-family: Arial, sans-serif;
+text-align: center;
+}
+h1 {
+color: #60a5fa;
+margin-bottom: 5px;
+}
+.subtitle { color: #cbd5e1; }
+#reader {
+max-width: 440px;
+margin: 25px auto;
+background: white;
+color: black;
+border-radius: 12px;
+overflow: hidden;
+}
+.card {
+max-width: 440px;
+margin: 20px auto;
+padding: 22px;
+background: #1e293b;
+border-radius: 14px;
+}
+.id {
+color: #93c5fd;
+font-size: 30px;
+font-weight: bold;
+overflow-wrap: anywhere;
+}
+button {
+width: 100%;
+padding: 16px;
+border: 0;
+border-radius: 10px;
+background: #2563eb;
+color: white;
+font-size: 18px;
+font-weight: bold;
+cursor: pointer;
+}
+input {
+width: 100%;
+padding: 14px;
+border-radius: 8px;
+border: 0;
+font-size: 18px;
+margin-bottom: 12px;
+}
+#status { color: #fbbf24; }
+</style>
+</head>
+<body>
+<h1>OHIO CYCLONES</h1>
+<p class="subtitle">Wrestling Club QR Scanner</p>
+
+<div id="reader"></div>
+<p id="status">Preparing scanner...</p>
+
+<div class="card" id="result" hidden>
+<h2>Wrestler Card Scanned</h2>
+<p id="memberId" class="id"></p>
+<p>QR code successfully read!</p>
+<button onclick="resetResult()">Scan Next Card</button>
+</div>
+
+<div class="card">
+<h3>Manual ID Test</h3>
+<input id="manualId" placeholder="OC-001">
+<button onclick="manualTest()">Test Member ID</button>
+</div>
+
+<script>
+let lastId = "";
+let scanner;
+
+function showResult(raw) {
+const id = String(raw).trim().toUpperCase();
+
+if (!/^OC-\d{3,}$/.test(id)) {
+document.getElementById("status").textContent =
+"Unrecognized QR code: " + id;
+return;
+}
+
+if (id === lastId) return;
+lastId = id;
+
+document.getElementById("memberId").textContent = id;
+document.getElementById("result").hidden = false;
+document.getElementById("status").textContent =
+"Successfully scanned " + id;
+
+if (navigator.vibrate) navigator.vibrate(150);
+}
+
+function resetResult() {
+lastId = "";
+document.getElementById("result").hidden = true;
+document.getElementById("status").textContent =
+"Ready for next wrestler";
+}
+
+function manualTest() {
+showResult(document.getElementById("manualId").value);
+}
+
+if (typeof Html5QrcodeScanner === "undefined") {
+document.getElementById("status").textContent =
+"Scanner library could not load.";
+} else {
+scanner = new Html5QrcodeScanner(
+"reader",
+{
+fps: 10,
+qrbox: { width: 220, height: 220 },
+rememberLastUsedCamera: true
+},
+false
+);
+scanner.render(showResult, function() {});
+document.getElementById("status").textContent =
+"Tap Request Camera Permissions to begin";
+}
+</script>
+</body>
+</html>
